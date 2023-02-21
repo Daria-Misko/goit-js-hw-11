@@ -11,6 +11,21 @@ const input = document.getElementById('search-form');
 const submitBtn = document.querySelector('.submitBtn');
 const gallery = document.querySelector('.gallery')
 
+// Не викликає скріпт декілька раз
+let waitForFinalEvent = (function() {
+	let timers = {};
+	return function(callback, ms, uniqueId) {
+		if (!uniqueId)
+			uniqueId = "Не викликає двічі без унікального ідентифікатору";
+
+		if (timers[uniqueId])
+			clearTimeout(timers[uniqueId]);
+
+		timers[uniqueId] = setTimeout(callback, ms);
+	};
+})();
+
+
 input.addEventListener('submit', onSubmit)
 
 const newsApiService = new NewsApiService();
@@ -25,15 +40,15 @@ function onSubmit(event) {
 	//скидаємо попередні результати
 	newsApiService.resetPage();
 
-	newsApiService.fetchPictures().then(hits => {
-		// appendImagesMarkup(hits)
+	newsApiService.fetchPictures().then(data => {
+	// appendImagesMarkup(hits)
 	
-	if (newsApiService.query === 	'') {
-			Notify.failure('Sorry, there are no images matching your search query. Please try again.')
+	if (newsApiService.query === '') {
+		Notify.failure('Sorry, there are no images matching your search query. Please try again.')
 	} else {
 		clearContainer();
-		appendImagesMarkup(hits)
-			Notify.success(`"Hooray! We found ${hits.totalHits} images.`)		
+		appendImagesMarkup(data.hits)
+		Notify.success(`Hooray! We found ${data.totalHits} images.`)		
 		}
 	}).catch(error => {
 		console.error(error)
@@ -44,3 +59,36 @@ function onSubmit(event) {
 function clearContainer() {
 	gallery.innerHTML = '';
 }
+
+
+/**
+ * Infinite scroll
+ */
+window.addEventListener('scroll', (e) => {
+
+	const {
+		scrollTop,
+		scrollHeight,
+		clientHeight
+	} = document.documentElement;
+	
+	if (scrollTop + clientHeight >= scrollHeight - 100) {
+
+		waitForFinalEvent(function(){
+			newsApiService.fetchPictures().then(data => {
+				if (data.hits.length > 0) {
+					appendImagesMarkup(data.hits);
+				} else {
+					Notify.failure('Sorry, there are no images more.');
+				}
+			}).catch(error => {
+				console.error(error)
+				Notify.failure('Sorry, there are no images matching your search query. Please try again.')
+			});
+
+		}, 300);
+
+	}
+
+
+}, { passive: true });

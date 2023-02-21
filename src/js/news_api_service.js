@@ -16,7 +16,7 @@ export default class NewsApiService {
 		}
 		const data = res.data;
 		this.incrementPage();
-		return data.hits;
+		return data;
 	}
 
 	//збільшення сторінки
