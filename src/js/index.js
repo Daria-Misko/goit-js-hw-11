@@ -83,7 +83,6 @@ window.addEventListener('scroll', (e) => {
 				}
 			}).catch(error => {
 				console.error(error)
-				Notify.failure('Sorry, there are no images matching your search query. Please try again.')
 			});
 
 		}, 300);
