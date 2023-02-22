@@ -25,7 +25,10 @@ svg {
 
 .form_wrapper {
 	padding: 15px 0;
-	background-color: #136cbb;
+	background-color: #136cbb;	
+	position: fixed;
+	top: 0;
+	width: 100%
 }
 
 .search-form{

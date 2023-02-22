@@ -8,7 +8,6 @@ import NewsApiService from "./news_api_service";
 import appendImagesMarkup from "./buildMarkup"
 
 const input = document.getElementById('search-form');
-const submitBtn = document.querySelector('.submitBtn');
 const gallery = document.querySelector('.gallery')
 
 // Не викликає скріпт декілька раз
@@ -41,7 +40,6 @@ function onSubmit(event) {
 	newsApiService.resetPage();
 
 	newsApiService.fetchPictures().then(data => {
-	// appendImagesMarkup(hits)
 	
 	if (newsApiService.query === '') {
 		Notify.failure('Sorry, there are no images matching your search query. Please try again.')
@@ -74,6 +72,7 @@ window.addEventListener('scroll', (e) => {
 	
 	if (scrollTop + clientHeight >= scrollHeight - 100) {
 
+
 		waitForFinalEvent(function(){
 			newsApiService.fetchPictures().then(data => {
 				if (data.hits.length > 0) {
@@ -82,7 +81,7 @@ window.addEventListener('scroll', (e) => {
 					Notify.failure('Sorry, there are no images more.');
 				}
 			}).catch(error => {
-				console.error(error)
+					Notify.warning(`We're sorry, but you've reached the end of search results.`)
 			});
 
 		}, 300);
